@@ -14,6 +14,8 @@
 #include "lwip/ip_addr.h"
 #include "lwip/tcpip.h"
 
+#include "dhcpserver/dhcpserver.h"
+
 static struct netif lwip_netif;
 static struct ip4_addr ipaddr;
 static struct ip4_addr netmask;
@@ -56,10 +58,13 @@ err_t myif_output(struct netif *netif, struct pbuf *p, const ip4_addr_t *ipaddr)
 void btstack_network_init(void (*send_packet_callback)(const uint8_t * packet, uint16_t size)) {
 	printf("btstack_network_init\n");
 	btstack_network_send_packet_callback = send_packet_callback;
+
+	IP4_ADDR(&ipaddr,  169, 254,   1,   1);
+	IP4_ADDR(&netmask, 255, 255,   0,   0);
+	IP4_ADDR(&gw,        0,   0,   0,   0);
 	netif_add(
 		&lwip_netif,
 		&ipaddr,
-		// IP4_ADDR(169, 254,   1,   1};
 		&netmask,
 		// IP4_ADDR(255, 255,   0,   0};
 		&gw,
@@ -69,6 +74,7 @@ void btstack_network_init(void (*send_packet_callback)(const uint8_t * packet, u
 		tcpip_input
 	);
 
+	dhcps_start(&lwip_netif, ipaddr);
 }
 
 /**

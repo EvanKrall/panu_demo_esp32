@@ -58,6 +58,9 @@
 
 #include "btstack_config.h"
 #include "btstack.h"
+#include "dhcpserver/dhcpserver.h"
+#include <esp_http_server.h>
+
 
 // #define ENABLE_PANU_CLIENT
 
@@ -424,6 +427,8 @@ static void network_send_packet_callback(const uint8_t * packet, uint16_t size){
 }
 /* LISTING_END */
 
+httpd_handle_t start_webserver(void);
+
 int btstack_main(int argc, const char * argv[]);
 int btstack_main(int argc, const char * argv[]){
 
@@ -446,6 +451,10 @@ int btstack_main(int argc, const char * argv[]){
 
     // Turn on the device
     hci_power_control(HCI_POWER_ON);
+
+    // start a web server
+    start_webserver();
+
     return 0;
 }
 
